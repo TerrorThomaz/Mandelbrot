@@ -14,7 +14,7 @@ plaatje.SetPixel(10, 10, Color.Red);
 
 // maar om complexere figuren te tekenen heb je een Graphics nodig
 Graphics tekenaar = Graphics.FromImage(plaatje);
-tekenaar.FillEllipse(Brushes.Blue, 30, 40, 100, 50);
+tekenaar.FillEllipse(Brushes.Red, 30, 40, 100, 50);
 
 // een Label kan ook gebruikt worden om een Bitmap te laten zien
 Label afbeelding = new Label();
