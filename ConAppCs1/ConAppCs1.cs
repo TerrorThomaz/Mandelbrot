@@ -1,5 +1,5 @@
 using System;
 
-Console.Write("Wat is je naam? ");
+Console.Write(" ");
 string naam = Console.ReadLine();
 Console.WriteLine($"Hallo {naam}!");
