@@ -1,6 +1,9 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
+using System.Windows.Forms.ComponentModel.Com2Interop;
 
 Form scherm = new Form();
 scherm.Text = "GrafAppCs2";
@@ -47,33 +50,58 @@ void zoom (object o, MouseEventArgs ea) {
     
 }
 
-
+int max_i = 4000;
 int mandel_berekening(double calc_x_schaal ,double calc_y_schaal, int x, int y)
 {
     double calc_x = calc_x_min + calc_x_schaal * x;
-
     double calc_y = calc_y_min + calc_y_schaal * y;
     double pyth = 0;
     double a = 0;
     double b = 0;
     int i = 0;
-    while (pyth < 2 && i < 4000)
+
+    while ((a*a + b*b) < 4 && i < max_i)
     {
         double n_a = a * a - b * b + calc_x;
-        double n_b = 2 * a * b + calc_y;
-        b = n_b;
+        b = 2 * a * b + calc_y;
         a = n_a;
-        pyth = Math.Sqrt((a * a) + (b * b));
-
         i = i + 1;
     }
-    return i;
+    return (i);
 }
 
+Color start = Color.Red;
+Color end = Color.Blue;
+
+double power = 0.2;
+
+
+Color[] GeneratePalette(Color start, Color end, int steps = 256)
+{
+    Color[] palette = new Color[steps];
+
+    double stepR = (end.R - start.R) / (double)(steps - 1);
+    double stepG = (end.G - start.G) / (double)(steps - 1);
+    double stepB = (end.B - start.B) / (double)(steps - 1);
+
+    for (int i = 0; i < steps; i++)
+    {
+        int r = (int)(start.R + stepR * i);
+        int g = (int)(start.G + stepG * i);
+        int b = (int)(start.B + stepB * i);
+
+        palette[i] = Color.FromArgb(r, g, b);
+    }
+
+    return palette;
+}
 
 
 void mandel(object o, EventArgs ea)
 {
+
+    Color[] palette = GeneratePalette(start, end, 256);
+    int N = palette.Length;
     double calc_x_stap = (calc_x_max - calc_x_min) / plaatje.Width;
     double calc_y_stap = (calc_y_max - calc_y_min) / plaatje.Height;
     for (int y = 0; y < plaatje.Height; y++)
@@ -81,15 +109,18 @@ void mandel(object o, EventArgs ea)
         for (int x = 0; x < plaatje.Width; x++)
         {
             int i = mandel_berekening(calc_x_stap, calc_y_stap, x, y);
-            
-            if (i % 2 == 0)
+
+
+            double t = (double)i / max_i;       // normalized 0–1
+            double v = Math.Pow(t, power) * N;  // nonlinear mapping
+            int index = (int)v % N;      
+            plaatje.SetPixel(x, y, palette[index]);
+            if (i == max_i)
             {
                 plaatje.SetPixel(x, y, Color.Black);
+                continue;
             }
-            else
-            {
-                plaatje.SetPixel(x, y, Color.White);
-            }
+
         }
     }
     afbeelding.Invalidate();
