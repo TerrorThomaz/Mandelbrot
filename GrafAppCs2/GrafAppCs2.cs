@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -47,17 +48,12 @@ void zoom (object o, MouseEventArgs ea) {
     
 }
 
-void mandel(object o, EventArgs ea)
-{
-    for (int y = 0; y < plaatje.Height; y++)
-    {
-        for (int x = 0; x < plaatje.Width; x++)
-        {
-            double calc_x_stap = (calc_x_max - calc_x_min) / plaatje.Width;
-            double calc_y_stap = (calc_y_max - calc_y_min) / plaatje.Height;
-            double calc_x = calc_x_min + calc_x_stap * x;
 
-            double calc_y = calc_y_min + calc_y_stap * y;
+int mandel_berekening(double calc_x_schaal ,double calc_y_schaal, int x, int y)
+{
+    double calc_x = calc_x_min + calc_x_schaal * x;
+
+    double calc_y = calc_y_min + calc_y_schaal * y;
             double pyth = 0;
             double a = 0;
             double b = 0;
@@ -72,6 +68,21 @@ void mandel(object o, EventArgs ea)
 
                 i = i + 1;
             }
+    return i;
+}
+
+
+
+void mandel(object o, EventArgs ea)
+{
+    double calc_x_stap = (calc_x_max - calc_x_min) / plaatje.Width;
+    double calc_y_stap = (calc_y_max - calc_y_min) / plaatje.Height;
+    for (int y = 0; y < plaatje.Height; y++)
+    {
+        for (int x = 0; x < plaatje.Width; x++)
+        {
+            int i = mandel_berekening(calc_x_stap, calc_y_stap, x, y);
+            
             if (i % 2 == 0)
             {
                 plaatje.SetPixel(x, y, Color.Black);
