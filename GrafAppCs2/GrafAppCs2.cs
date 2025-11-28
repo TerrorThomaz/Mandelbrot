@@ -48,7 +48,7 @@ void zoom (object o, MouseEventArgs ea) {
 }
 
 
-int mandel_berekening(double calc_x_schaal ,double calc_y_schaal, int x, int y)
+(int inter, double pythago) mandel_berekening(double calc_x_schaal ,double calc_y_schaal, int x, int y)
 {
     double calc_x = calc_x_min + calc_x_schaal * x;
 
@@ -67,9 +67,12 @@ int mandel_berekening(double calc_x_schaal ,double calc_y_schaal, int x, int y)
 
         i = i + 1;
     }
-    return i;
+    return (inter: i, pythago: pyth);
 }
 
+double base_red = 255;
+double base_green = 0;
+double base_blue = 120;
 
 
 void mandel(object o, EventArgs ea)
@@ -80,16 +83,13 @@ void mandel(object o, EventArgs ea)
     {
         for (int x = 0; x < plaatje.Width; x++)
         {
-            int i = mandel_berekening(calc_x_stap, calc_y_stap, x, y);
-            
-            if (i % 2 == 0)
-            {
-                plaatje.SetPixel(x, y, Color.Black);
-            }
-            else
-            {
-                plaatje.SetPixel(x, y, Color.White);
-            }
+            var result_calc = mandel_berekening(calc_x_stap, calc_y_stap, x, y);
+            int i = result_calc.inter;
+            double pyth = result_calc.pythago;
+            int value_red = (int)(Math.Min(base_red, pyth * 120));
+            int value_green = (int)(Math.Min(base_green, pyth * 120));
+            int value_blue = (int)(Math.Min(base_blue, pyth * 120));
+            plaatje.SetPixel(x, y, Color.FromArgb(value_red, value_green, value_blue));
         }
     }
     afbeelding.Invalidate();
