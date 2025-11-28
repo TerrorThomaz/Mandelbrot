@@ -5,16 +5,16 @@ using System.Windows.Forms;
 Form scherm = new Form();
 scherm.Text = "GrafAppCs2";
 scherm.BackColor = Color.LightYellow;
-scherm.ClientSize = new Size(300, 300);
+scherm.ClientSize = new Size(500, 500);
 
 
 
 // met een Bitmap kun je een plaatje opslaan in het geheugen
-Bitmap plaatje = new Bitmap(200, 200);
+Bitmap plaatje = new Bitmap(400, 400);
 Label afbeelding = new Label();
 scherm.Controls.Add(afbeelding);
 afbeelding.Location = new Point(10, 10);
-afbeelding.Size = new Size(200, 200);
+afbeelding.Size = new Size(400, 400);
 afbeelding.BackColor = Color.White;
 afbeelding.Image = plaatje;
 
@@ -92,14 +92,14 @@ void mandel(object o, EventArgs ea)
             }
         }
     }
-    afbeelding.Refresh();
+    afbeelding.Invalidate();
 }
 
 afbeelding.MouseClick += zoom;
 
 Button knop = new Button();
 scherm.Controls.Add(knop);
-knop.Location = new Point(220, 10);
+knop.Location = new Point(420, 10);
 knop.Size = new Size(30, 30); 
 knop.BackColor = Color.Red;
 knop.Click += mandel;
