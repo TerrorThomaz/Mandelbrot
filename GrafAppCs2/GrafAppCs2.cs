@@ -14,11 +14,11 @@ scherm.ClientSize = new Size(1400, 1400);
 
 
 // met een Bitmap kun je een plaatje opslaan in het geheugen
-Bitmap plaatje = new Bitmap(1200, 1200);
+Bitmap plaatje = new Bitmap(400, 400);
 Label afbeelding = new Label();
 scherm.Controls.Add(afbeelding);
 afbeelding.Location = new Point(0, 0);
-afbeelding.Size = new Size(1200, 900);
+afbeelding.Size = new Size(400, 400);
 afbeelding.BackColor = Color.White;
 afbeelding.Image = plaatje;
 
@@ -313,8 +313,6 @@ int mandel_berekening(double calc_x_schaal ,double calc_y_schaal, int x, int y)
     return (i);
 }
 
-Color start = Color.AntiqueWhite;
-Color end = Color.Blue;
 
 double power = 0.15;
 
@@ -334,7 +332,7 @@ void mandel(object o, EventArgs ea)
             int i = mandel_berekening(calc_x_stap, calc_y_stap, x, y);
 
             //berekening vanuit wikipedia "Plotting algorithms for the Mandelbrot set"
-            int steps = 10000;
+
             double t = (double)i / max_i;       // waarde van 0–1
             double v = Math.Pow(t, power) * N;  
             double index = v % N;
