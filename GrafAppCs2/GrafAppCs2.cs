@@ -8,16 +8,16 @@ using System.Windows.Forms.ComponentModel.Com2Interop;
 Form scherm = new Form();
 scherm.Text = "GrafAppCs2";
 scherm.BackColor = Color.LightYellow;
-scherm.ClientSize = new Size(1200, 1200);
+scherm.ClientSize = new Size(1400, 1400);
 
 
 
 // met een Bitmap kun je een plaatje opslaan in het geheugen
-Bitmap plaatje = new Bitmap(1000, 1000);
+Bitmap plaatje = new Bitmap(1200, 1200);
 Label afbeelding = new Label();
 scherm.Controls.Add(afbeelding);
-afbeelding.Location = new Point(10, 10);
-afbeelding.Size = new Size(900, 900);
+afbeelding.Location = new Point(0, 0);
+afbeelding.Size = new Size(1200, 900);
 afbeelding.BackColor = Color.White;
 afbeelding.Image = plaatje;
 
@@ -118,7 +118,7 @@ afbeelding.MouseClick += zoom;
 
 Button knop = new Button();
 scherm.Controls.Add(knop);
-knop.Location = new Point(920, 10);
+knop.Location = new Point(1220, 10);
 knop.Size = new Size(30, 30); 
 knop.BackColor = Color.Red;
 knop.Click += mandel;
@@ -126,7 +126,7 @@ knop.Click += mandel;
 // maar om complexere figuren te tekenen heb je een Graphics nodig
 
 Button save_knop = new Button();
-save_knop.Location = new Point(920, 70);
+save_knop.Location = new Point(1220, 70);
 save_knop.Size = new Size(30, 30);
 save_knop.BackColor = Color.Black;
 scherm.Controls.Add(save_knop);
