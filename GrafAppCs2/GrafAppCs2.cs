@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Forms.ComponentModel.Com2Interop;
@@ -37,16 +38,15 @@ double orig_y_max = calc_y_max;
 
 // originele kleuren
 Color start = Color.Red;
-Color end = Color.Blue;
 
 //maximum iteraties origineel
 int max_i = 4000;
 
 //presets
-(double X, double Y, double Zoom, string StartColor, string EndColor) preset1 = (0.0, 0.0, 1, "#FF0000", "#0000FF");
-(double X, double Y, double Zoom, string StartColor, string EndColor) preset2 = (-0.75, 0.1, 1, "#00FF00", "#0000FF");
-(double X, double Y, double Zoom, string StartColor, string EndColor) preset3 = (0.3, -0.01, 1, "#FF00FF", "#FFFF00");
-(double X, double Y, double Zoom, string StartColor, string EndColor) preset4 = (-1.25, 0.0, 1, "#00FFFF", "#FF00FF");
+(double X, double Y, double Zoom, string StartColor) preset1 = (0.0, 0.0, 1, "#FF0000");
+(double X, double Y, double Zoom, string StartColor) preset2 = (-0.75, 0.1, 1, "#00FF00");
+(double X, double Y, double Zoom, string StartColor) preset3 = (0.3, -0.01, 1, "#FF00FF");
+(double X, double Y, double Zoom, string StartColor) preset4 = (-1.25, 0.0, 1, "#00FFFF");
 
 
 //label en textbox voor middelpunt X input
@@ -111,53 +111,54 @@ start_kleur_TB.Size = new Size(100, 40);
 start_kleur_TB.Text = "#FF0000";
 scherm.Controls.Add(start_kleur_TB);
 
-Label eind_kleur_label = new Label();
-eind_kleur_label.Text = "geef me een kleur in hex code (rgb)";
-eind_kleur_label.Location = new Point(1250, 210);
-eind_kleur_label.Size = new Size(400, 20);
-scherm.Controls.Add(eind_kleur_label);
-TextBox eind_kleur_TB = new TextBox();
-eind_kleur_TB.Location = new Point(1250, 230);
-eind_kleur_TB.Size = new Size(100, 40);
-eind_kleur_TB.Text = "#0000FF";
-scherm.Controls.Add(eind_kleur_TB);
 
 //max iteratie label en textbox
 Label iteraties_label = new Label();
 iteraties_label.Text = "Geef het maximum aantal iteraties (>0)";
-iteraties_label.Location = new Point(1250, 250);
+iteraties_label.Location = new Point(1250, 210);
 iteraties_label.Size = new Size(400, 20);
 scherm.Controls.Add(iteraties_label);
 TextBox iteraties_TB = new TextBox();
-iteraties_TB.Location = new Point(1250, 270);
+iteraties_TB.Location = new Point(1250, 230);
 iteraties_TB.Size = new Size(100, 40);
 iteraties_TB.Text = "4000";
 scherm.Controls.Add(iteraties_TB);
 
+//label om aan te geven dat enter werkt
+Label enter_aangeven = new Label();
+enter_aangeven.Text = "Druk op enter om toe te passen";
+enter_aangeven.Location = new Point(1250, 250);
+enter_aangeven.Size = new Size(400, 20);
+scherm.Controls.Add(enter_aangeven);
+
+
 //preset buttons
 Button preset1_button = new Button();
 preset1_button.Text = "Preset 1";
-preset1_button.Location = new Point(1250, 330);
+preset1_button.Location = new Point(1250, 280);
 preset1_button.Size = new Size(80, 30);
 scherm.Controls.Add(preset1_button);
 
 Button preset2_button = new Button();
 preset2_button.Text = "Preset 2";
-preset2_button.Location = new Point(1350, 330);
+preset2_button.Location = new Point(1350, 280);
 preset2_button.Size = new Size(80, 30);
 scherm.Controls.Add(preset2_button);
 
 Button preset3_button = new Button();
 preset3_button.Text = "Preset 3";
-preset3_button.Location = new Point(1250, 370);
+preset3_button.Location = new Point(1250, 320);
 preset3_button.Size = new Size(80, 30);
 scherm.Controls.Add(preset3_button);
 
 Button preset4_button = new Button();
 preset4_button.Text = "Preset 4";
-preset4_button.Location = new Point(1350, 370);
+preset4_button.Location = new Point(1350, 320);
 preset4_button.Size = new Size(80, 30);
 scherm.Controls.Add(preset4_button);
+
+
+
 
 
 
@@ -206,26 +207,11 @@ void lees_TB()
         return;
     }
 
-    //eind kleur
-    Color endColor;
-    try
-    {
-        endColor = ColorTranslator.FromHtml(eind_kleur_TB.Text);
-    }
-    catch
-    {
-        MessageBox.Show(
-            "Ongeldige eindkleur. Gebruik bijv. '00FF00', '#00FF00', 'Red' of '128,255,0'.",
-            "Input error",
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Warning
-        );
-        return;
-    }
+    
 
     // kleuren toepassen
     start = startColor;
-    end = endColor;
+    
 
 
     //originele waardes
@@ -361,7 +347,6 @@ Center_X_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); man
 Center_Y_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); mandel(null, EventArgs.Empty); } };
 Zoom_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); mandel(null, EventArgs.Empty); } };
 start_kleur_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); mandel(null, EventArgs.Empty); } };
-eind_kleur_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); mandel(null, EventArgs.Empty); } };
 iteraties_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); mandel(null, EventArgs.Empty); } };
 
 
@@ -372,7 +357,6 @@ preset1_button.Click += (s, e) =>
     Center_Y_TB.Text = preset1.Y.ToString("G6");
     Zoom_TB.Text = preset1.Zoom.ToString("G6");
     start_kleur_TB.Text = preset1.StartColor;
-    eind_kleur_TB.Text = preset1.EndColor;
     lees_TB();
     mandel(null, EventArgs.Empty);
 };
@@ -383,7 +367,6 @@ preset2_button.Click += (s, e) =>
     Center_Y_TB.Text = preset2.Y.ToString("G6");
     Zoom_TB.Text = preset2.Zoom.ToString("G6");
     start_kleur_TB.Text = preset2.StartColor;
-    eind_kleur_TB.Text = preset2.EndColor;
     lees_TB();
     mandel(null, EventArgs.Empty);
 };
@@ -394,7 +377,6 @@ preset3_button.Click += (s, e) =>
     Center_Y_TB.Text = preset3.Y.ToString("G6");
     Zoom_TB.Text = preset3.Zoom.ToString("G6");
     start_kleur_TB.Text = preset3.StartColor;
-    eind_kleur_TB.Text = preset3.EndColor;
     lees_TB();
     mandel(null, EventArgs.Empty);
 };
@@ -405,24 +387,10 @@ preset4_button.Click += (s, e) =>
     Center_Y_TB.Text = preset4.Y.ToString("G6");
     Zoom_TB.Text = preset4.Zoom.ToString("G6");
     start_kleur_TB.Text = preset4.StartColor;
-    eind_kleur_TB.Text = preset4.EndColor;
     lees_TB();
     mandel(null, EventArgs.Empty);
 };
 
-
-
-Button knop = new Button();
-scherm.Controls.Add(knop);
-knop.Location = new Point(1220, 10);
-knop.Size = new Size(30, 30); 
-knop.BackColor = Color.Black;
-knop.Click += mandel;
-knop.Click += (s, e) =>
-{
-    lees_TB();
-    mandel(null, EventArgs.Empty);
-};
 
 lees_TB();
 mandel(null, EventArgs.Empty);
@@ -430,9 +398,10 @@ mandel(null, EventArgs.Empty);
 // maar om complexere figuren te tekenen heb je een Graphics nodig
 
 Button save_knop = new Button();
-save_knop.Location = new Point(1220, 70);
-save_knop.Size = new Size(30, 30);
-save_knop.BackColor = Color.Black;
+save_knop.Location = new Point(1250, 370);
+save_knop.Size = new Size(250, 30);
+save_knop.BackColor = Color.Green;
+save_knop.Text = "klik hierop om de afbeelding op te slaan";
 scherm.Controls.Add(save_knop);
 save_knop.Click += opslaan;
 
