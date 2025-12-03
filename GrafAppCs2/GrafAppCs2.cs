@@ -14,11 +14,11 @@ scherm.ClientSize = new Size(1920, 1080);
 
 
 // met een Bitmap kun je een plaatje opslaan in het geheugen
-Bitmap plaatje = new Bitmap(400, 400);
+Bitmap plaatje = new Bitmap(800, 800);
 Label afbeelding = new Label();
 scherm.Controls.Add(afbeelding);
 afbeelding.Location = new Point(0, 0);
-afbeelding.Size = new Size(400, 400);
+afbeelding.Size = new Size(800, 800);
 afbeelding.BackColor = Color.White;
 afbeelding.Image = plaatje;
 
