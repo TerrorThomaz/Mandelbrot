@@ -2,13 +2,14 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Forms.ComponentModel.Com2Interop;
 
 Form scherm = new Form();
 scherm.Text = "GrafAppCs2";
 scherm.BackColor = Color.LightYellow;
-scherm.ClientSize = new Size(500, 500);
+scherm.ClientSize = new Size(800, 500);
 
 
 
@@ -26,29 +27,141 @@ double calc_y_min = -2.0;
 double calc_x_max = 2.0;
 double calc_y_max = 2.0;
 
-void zoom (object o, MouseEventArgs ea) {
+// --- keep the ORIGINAL full-view bounds (never change these) ---
+double orig_x_min = calc_x_min;
+double orig_y_min = calc_y_min;
+double orig_x_max = calc_x_max;
+double orig_y_max = calc_y_max;
 
-    
+
+
+
+//label en textbox voor middelpunt X input
+Label Center_X_Label = new Label();
+Center_X_Label.Text = "Geef een X coördinaat voor het middelpunt (tussen -2 en 2)";
+Center_X_Label.Location = new Point(460, 10);
+scherm.Controls.Add(Center_X_Label);
+Center_X_Label.Size = new Size(400, 20);
+TextBox Center_X_TB = new TextBox();
+Center_X_TB.Location = new Point(460, 30);
+Center_X_TB.Size = new Size(100, 40);
+Center_X_TB.Text = "0.0";
+scherm.Controls.Add(Center_X_TB);
+
+//label en textbox voor middelpunt Y input
+Label Center_Y_Label = new Label();
+Center_Y_Label.Text = "Geef een Y coördinaat voor het middelpunt (tussen -2 en 2)";
+Center_Y_Label.Location = new Point(460, 50);
+scherm.Controls.Add(Center_Y_Label);
+Center_Y_Label.Size = new Size(400, 20);
+TextBox Center_Y_TB = new TextBox();
+Center_Y_TB.Location = new Point(460, 70);
+Center_Y_TB.Size = new Size(100, 40);
+Center_Y_TB.Text = "0.0";
+scherm.Controls.Add(Center_Y_TB);
+
+//label en textbox voor zoom waarde input
+Label Zoom_Label = new Label();
+Zoom_Label.Text = "Geef de zoom waarde aan (>0)";
+Zoom_Label.Location = new Point(460, 90);
+scherm.Controls.Add(Zoom_Label);
+Zoom_Label.Size = new Size(400, 20);
+TextBox Zoom_TB = new TextBox();
+Zoom_TB.Location = new Point(460, 110);
+Zoom_TB.Size = new Size(100, 40);
+Zoom_TB.Text = "0.1";
+scherm.Controls.Add(Zoom_TB);
+
+
+//label en textbox voor zoom / click 
+Label Zoom_Click_Label = new Label();
+Zoom_Click_Label.Text = "Geef de zoom waarde aan (>0)";
+Zoom_Click_Label.Location = new Point(460, 130);
+scherm.Controls.Add(Zoom_Click_Label);
+Zoom_Click_Label.Size = new Size(400, 20);
+TextBox Zoom_Click_TB = new TextBox();
+Zoom_Click_TB.Location = new Point(460, 150);
+Zoom_Click_TB.Size = new Size(100, 40);
+Zoom_Click_TB.Text = "2";
+scherm.Controls.Add(Zoom_Click_TB);
+
+
+// functie om de gegeven waardes te checken en de nieuwe waardes te implementeren
+void lees_TB()
+{
+    if (!double.TryParse(Center_X_TB.Text, out double center_X))
+    {
+        MessageBox.Show("Middelpunt X niet goed, geef een getal", "Input error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+    if (!double.TryParse(Center_Y_TB.Text, out double center_Y))
+    {
+        MessageBox.Show("Middelpunt Y waarde niet goed, geef een getal", "Input error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+    if (!double.TryParse(Zoom_TB.Text, out double zoom) || zoom <= 0)
+    {
+        MessageBox.Show("Zoom waarde te klein. Geef een waarde groter dan 0", "Input error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+
+    //originele waardes
+    double orig_width = orig_x_max - orig_x_min;
+    double orig_height = orig_y_max - orig_y_min;
+    //nieuwe waardes door input
+    double new_width = orig_width / zoom;
+    double new_height = orig_height / zoom;
+    //centreren
+    calc_x_min = center_X - new_width / 2.0;
+    calc_x_max = center_X + new_width / 2.0;
+    calc_y_min = center_Y - new_height / 2.0;
+    calc_y_max = center_Y + new_height / 2.0;
+
+}
+
+//veranderingen om te zorgen dat de textboxes worden geüpdatet
+void zoom(object o, MouseEventArgs ea)
+{
+    if (!double.TryParse(Zoom_Click_TB.Text, out double click_zoom) || click_zoom <= 0)
+    {
+        MessageBox.Show("Zoom waarde te klein of geen getal. Geef een getal groter dan 0", "Input error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+
     double calc_x_stap = (calc_x_max - calc_x_min) / plaatje.Width;
     double calc_y_stap = (calc_y_max - calc_y_min) / plaatje.Height;
 
+    
     double clicked_x = calc_x_min + ea.X * calc_x_stap;
     double clicked_y = calc_y_min + ea.Y * calc_y_stap;
+  
 
-    double factor = 0.5;
-
-    double width = (calc_x_max - calc_x_min) * factor;
-    double height = (calc_y_max - calc_y_min) * factor;
     
-    calc_x_min = clicked_x - width / 2;
-    calc_x_max = clicked_x + width / 2;
-    calc_y_min = clicked_y - height / 2;
-    calc_y_max = clicked_y + height / 2;
+    double currentWidth = calc_x_max - calc_x_min;
+    double origWidth = orig_x_max - orig_x_min;
+    double currentZoom = origWidth / currentWidth;
 
+    double newZoom = currentZoom * click_zoom;
+
+    
+    
+    double newWidth = origWidth / newZoom;
+    double newHeight = (orig_y_max - orig_y_min) / newZoom;
+
+    calc_x_min = clicked_x - newWidth / 2.0;
+    calc_x_max = clicked_x + newWidth / 2.0;
+    calc_y_min = clicked_y - newHeight / 2.0;
+    calc_y_max = clicked_y + newHeight / 2.0;
+
+    //verander text in textboxes
+    Center_X_TB.Text = clicked_x.ToString("G6");
+    Center_Y_TB.Text = clicked_y.ToString("G6");
+    Zoom_TB.Text = newZoom.ToString("G6");
+    Zoom_Click_TB.Text = click_zoom.ToString("G6");
+    
     mandel(null, EventArgs.Empty);
-    
-    
 }
+
 
 int max_i = 4000;
 int mandel_berekening(double calc_x_schaal ,double calc_y_schaal, int x, int y)
@@ -128,12 +241,28 @@ void mandel(object o, EventArgs ea)
 
 afbeelding.MouseClick += zoom;
 
+// enter zorgt voor berekening
+Center_X_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); mandel(null, EventArgs.Empty); } };
+Center_Y_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); mandel(null, EventArgs.Empty); } };
+Zoom_TB.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { lees_TB(); mandel(null, EventArgs.Empty); } };
+
+
+
 Button knop = new Button();
 scherm.Controls.Add(knop);
 knop.Location = new Point(420, 10);
 knop.Size = new Size(30, 30); 
-knop.BackColor = Color.Red;
+knop.BackColor = Color.Black;
 knop.Click += mandel;
+knop.Click += (s, e) =>
+{
+    lees_TB();
+    mandel(null, EventArgs.Empty);
+};
+
+lees_TB();
+mandel(null, EventArgs.Empty);
+
 Application.Run(scherm);
 // maar om complexere figuren te tekenen heb je een Graphics nodig
 
